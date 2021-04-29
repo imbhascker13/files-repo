@@ -1,0 +1,41 @@
+pre-release:
+who'll be taking care of rackspace tickets and SLA (accenture or g&v)?
+what can be the downtime while updating the patches to shared resources?
+How are the RDS backups are managed? DO they have zonal backup?
+Certificates and the DNS are managed by whom? And how the rotation policy works?
+What are the tickets that rackspace will handle and how the SLAs are being agreed?
+
+Build:
+which build tool does we use in deployment process?
+where do we store artifacts of an application?
+do we use sonarqube or any other tool for finding vulnerabilities in application?
+
+deployments:
+do we use any versions or tags for the deployments we do?
+what will these commands do dyson setup:di:compile; dyson setup:static-content:deploy in deployment process?
+will there be any recent deployments (in number) for rollback process in dr?
+Was there any DR drill?
+
+Post-release:
+do we perform roll-back and fix forward in parallel in case of disaster recovery?
+when bugs are found in production deploy, how to eliminate the php exceptions?
+how can we remove the source of intrusion/malware?
+Do we have any metrics around the DR?
+
+Whynjkm.151
+tasks:
+1.Setting Up an Amazon SNS Topic Using the AWS Management Console
+subtasks:
+To create an SNS topic
+To subscribe to an SNS topic
+To create an alarm action
+2.Setting Up an SNS Topic Using the AWS CLI
+subtasks:
+To set up an SNS topic
+
+Row-2334
+1.To perform merge strategy
+2.To perform sanity check (if needed)
+3.To deploy it to the pre-prod environment for the au and in markets
+	
+

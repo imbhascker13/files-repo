@@ -1,0 +1,35 @@
+dyson site:admin:ip staging-aws in (command to get ip address)
+ssh user.name@ip address
+cd /etc/postfix/
+ll
+sasl_passwd.db (encrypted wrapped up password credentials)
+vim generic (will attach the email address from the group vars, if email addrss provided wrong, it won't connect to ses)
+vim main.cf(template file in ansible, if email addresses weren't provided, then the relay host set of commands will be empty or not found)
+dyson site:setup(all the configurations will regenerate)
+dyson deploy staging aws-il (il relates to israel nation)
+dyson site:frontend:ip staging-aws il (it'll fetch the details abt site type:frontend)
+ssh user.name@ip address
+we can find lambdas regarding info in dyson vagrant source code.
+
+list of tools:
+Pagerduty
+Slack
+Ansible CLI  Opensource	3.5.1
+Terraform
+Vagrant
+AWS CLI		2
+Docker 	Free	19.x 
+GIT	GPL	2.3	200
+Need to install below software's
+AWS CLI, Ansible CLI, Docker, Slack, WinSCP, OpenVPN, Terraform CLI, GIT, Bitbucket, VS code, Vagrant
+
+dyson site:frontend:ip staging-aws in
+ssh user.name@ip address
+cd /var/www/in/
+cd releases/
+if db changes hadn't there, we'll symlink nginx current folder to previous release folder to get site maintenance disabled.
+vars.yaml:
+	deploy-branch: master --> deploy-branch: main
+
+Whynjkm.151
+curtley philips and dean smith

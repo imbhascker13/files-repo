@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mysql-deploy
+  name: mysql-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mysql-deploy
+    spec:
+      containers:
+      - image: mysql:latest
+        name: mysql
+ #	restart: always
+ #       environment:
+ #        - MYSQL_ROOT_PASSWORD= root
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mysql-deploy
+  name: mysql-deploy
+
+spec:
+  ports:
+  - name: 3306-3306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql-deploy
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+kubectl edit svc app-deploy 
+kubectl get all
+sudo ufw allow 30000
+kubectl get no -o wide
+
+1. Create specific account for tiller
+kubectl --namespace kube-system create serviceaccount tiller
+
+ 
+
+2. Check if you have clusterrole
+kubectl --namespace kube-system get clusterrole cluster-admin -o yaml
+
+ 
+
+3. Check if account "tiller" in first clause has a binding to clusterrole "cluster-admin" 
+kubectl --namespace kube-system get clusterrolebinding
+kubectl --namespace kube-system get clusterrolebinding | grep -i cluster-admin
+
+ 
+
+4. Create new clusterrolebinding for tiller if not there already
+kubectl --namespace kube-system create clusterrolebinding tiller-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+
+ 
+
+5. Check if you really act as this account
+kubectl --namespace kube-system get deploy tiller-deploy -o yaml
+
+ 
+
+6. The above output will not have settings "serviceAccount" and "serviceAccountName", so than add an account you want tiller to use
+kubectl --namespace kube-system patch deploy tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: spring-boot-hello
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spring-boot-hello
+    spec:
+      containers:
+        - name: application
+          image: iambhascker13/myimage:v1.0
+          imagePullPolicy: Always
+          resources:
+             requests:
+                cpu: "0.1"
+                memory: "100Mi"
+          volumeMounts:
+            -
+              mountPath: /tomcat/logs
+              name: access-logs
+          ports:
+            - containerPort: 8080
+        - name: fluentd-agent
+          image: iambhascker13/myimage:v1.0
+          imagePullPolicy: Always
+          volumeMounts:
+            -
+              mountPath: /tomcat/logs
+              name: access-logs
+      volumes:
+        -
+          name: access-logs
+          emptyDir: {}
+docker build -t fluentd-node-sample:latest -f /root/app/efk-kubernetes/sample-app/Dockerfile sample-app
+ kubectl create -f /root/app/efk-kubernetes/kubernetes/node-deployment.yaml
+
+

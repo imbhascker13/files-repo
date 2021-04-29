@@ -1,0 +1,29 @@
+#installation and configuration steps for logstash
+
+#Install Logstash
+sudo apt install logstash
+
+#Create a configuration file called input.conf where you will set up your Filebeat input
+sudo nano /etc/logstash/conf.d/input.conf
+
+#create a configuration file called syslog-filter.conf, where we will add a filter for system logs, also known as syslogs
+sudo nano /etc/logstash/conf.d/syslog-filter.conf
+
+#Lastly, create a configuration file called output.conf
+sudo nano /etc/logstash/conf.d/output.conf
+
+Note:The above mentioned 3 config files were edited in logstash_setup folder
+
+#Test your Logstash configuration
+sudo -u logstash /usr/share/logstash/bin/logstash --path.settings /etc/logstash -t
+
+#start and enable Logstash to put the configuration changes into effect
+sudo systemctl start logstash
+sudo systemctl enable logstash
+
+
+java -javaagent:/root/apm-server-6.5.4-amd64.deb \
+     -Delastic.apm.service_name=my-application \
+     -Delastic.apm.server_url=http://localhost:8200 \
+     -Delastic.apm.application_packages=org.example \
+     -jar my-application.jar

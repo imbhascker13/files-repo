@@ -1,0 +1,284 @@
+172.17.0.2
+78da7a0f51967583f1509a73631312cf57ab74858c55826dfa21eb5f1
+docker run -v /app/logs:/tmp -p 8083:8080 --name myappcon -d 64141433bc97
+pls suggest me a perfect logstash.conf file for app logs having various parameters so that i can perform queries n create dashboards easily.
+input {
+  beats {
+    port => 5044
+   # host => "0.0.0.0"
+  }
+}
+filter {
+  if [type] == "nginx-access" {
+    grok {
+      match => { "message" => "%{NGINXACCESS}" }
+    }
+  }
+}
+output {
+  elasticsearch {
+    hosts => ["localhost:9200"]
+    manage_template => false
+    index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+  }
+}
+ kubectl create deployment app-deploy --image=iambhascker13/myimage:v1.0 --dry-run -o=yaml > deployment.yaml
+kubectl create service clusterip app-deploy --tcp=8080:8080 --dry-run -o=yaml >> deployment.yaml
+kubectl create deployment mysql-deploy --image=mysql:latest --dry-run -o=yaml > mysql-deployment.yaml
+kubectl create service clusterip mysql-deploy --tcp=3306:3306 --dry-run -o=yaml >> mysql-deployment.yaml
+
+docker run -p 3306:3306 --name mysql -e MYSQL_ROOT_PASSWORD=root -d mysql:latest
+environment:
+  - MYSQL_ROOT_PASSWORD=root
+10.103.149.140
+kubectl delete pods -n logging --field-selector=status.phase=Failed
+
+java -javaagent:/root/java-jar/agent.jar -jar /root/company/companyjpa_lo/company/target/
+
+java -javaagent:/root/java-jar/agent.jar \
+     -Delastic.apm.service_name=my-application \
+     -Delastic.apm.server_url=http://localhost:8200 \
+     -Delastic.apm.application_packages=com.mindtree \
+     -jar /root/shopping/oreilly-docker-java-shopping/shopfront/target/shopfront-0.0.1-SNAPSHOT.jar
+
+["java",-javaagent:/root/java-jar/agent.jar,"-jar","/root/shopping/oreilly-docker-java-shopping/shopfront/target/shopfront-0.0.1-SNAPSHOT.jar"]
+
+java -javaagent:/root/java-jar/elastic-apm-agent-1.18.0.jar -Delastic.apm.service_name=my-app -Delastic.apm.server_urls=http://34.122.135.48/:8200 -jar shopfront-0.0.1-SNAPSHOT.jar
+
+
+java -javaagent:/root/java-jar/agent.jar \
+     -Delastic.apm.service_name=my-application \
+     -Delastic.apm.server_url=http://localhost:8200 \
+     -Delastic.apm.application_packages=com.mindtree \
+     -jar /root/micro/channel-subscription-customer-microservice/CustomerService/target/CustomerService-0.0.1-SNAPSHOT.jar
+
+FROM tomcat:9.0
+
+RUN echo 'Deploying War on Server'
+
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+COPY target/.jar usr/local/tomcat/webapps/ROOT.jar
+
+EXPOSE 8080
+
+CMD ["catalina.sh", "run"]
+
+kubectl create service clusterip shop-demo --tcp=8010:8010 --dry-run -o=yaml >> new-deployment.yaml
+
+
+· Improved myself in terms of understanding the requirements and analyzing problems.
+
+· Focused on learning via yorbit 201 and 301 courses and acquired 5 credits.
+
+· Completed 2 external certifications AZ 104 and AZ 900.
+
+· I have worked on POC’s under Sushma thimappa from feb-march
+
+· Worked and understood on DevOps tools i.e. Jenkins, Ansible, Sonarqube, Zabbix, Slack, TruffleHog, Bitbucket-pipelines.
+
+· Worked on Devops Stack on Slack Accelerator.
+
+· Ensured completion of tasks in time and punctual with information related to time sheets, NIO /leaves.
+
+· Currently working on Observability Dashboard Project and understood log analysis using ELK-Stack and EFK-Stack.
+
+10.107.82.19:9200 31132
+10.111.200.26:5601 31079
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: monitoring
+  name: apm-server-config
+  labels:
+    app: apm-server
+data:
+  apm-server.yml: |-
+    apm-server:
+      host: "0.0.0.0:8200"
+
+    output.elasticsearch:
+      hosts: ['http://34.122.135.48:31132']
+    setup.kibana:
+      host: 'http://34.122.135.48:31079'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: monitoring
+  name: apm-server
+  labels:
+    app: apm-server
+spec:
+  ports:
+  - port: 8200
+    name: apm-server
+  selector:
+    app: apm-server
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: monitoring
+  name: apm-server
+  labels:
+    app: apm-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apm-server
+    spec:
+      containers:
+      - name: apm-server
+        image: docker.elastic.co/apm/apm-server:7.3.0
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: "10.107.82.19"
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: KIBANA_HOST
+          value: "10.111.200.26"
+        - name: KIBANA_PORT
+          value: "5601"
+        ports:
+        - containerPort: 8200
+          name: apm-server
+        volumeMounts:
+        - name: config
+          mountPath: /usr/share/apm-server/apm-server.yml
+          readOnly: true
+          subPath: apm-server.yml
+      volumes:
+      - name: config
+        configMap:
+          name: apm-server-config
+---
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: spring-boot-simple
+  labels:
+    app: spring-boot-simple
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-simple
+  template:
+    metadata:
+      labels:
+        app: spring-boot-simple
+    spec:
+      containers:
+      - image: iambhascker13/mydocker:v0.0.3
+        imagePullPolicy: Always
+        name: spring-boot-simple
+        command:
+          - "java"
+          - "-javaagent:/apm-agent.jar"
+          - "-Delastic.apm.server_urls=http://10.97.214.137:8200"
+          - "-Delastic.apm.service_name=spring-boot-simple"
+          - "-jar"
+          - "app.jar"
+        env:
+          - name: ELASTIC_APM_ACTIVE
+            value: "true"
+          - name: ELASTIC_APM_SERVER
+            value: http://10.97.214.137:8200
+        ports:
+        - containerPort: 8089
+---
+
+slide1
+log analysis:
+ 	1.Log analysis is the process of reviewing, interpreting and understand computer-generated records called logs.
+	2.Logs are generated by a range of programmable technologies, including networking devices, operating systems, applications, and more
+	3.A log consists of a series of messages in time-sequence that describe activities going on within a system
+	4.Log files may be streamed to a log collector through an active network, or they may be stored in files for later review
+	5.Log analysis is the delicate art of reviewing and interpreting these messages to gain insight into the inner workings of the system.
+slide2
+efk stack for log analysis:
+	1.The EFK stack aggregates logs from hosts and applications, whether coming from multiple containers or even deleted pods
+	2.The EFK stack is a modified version of the ELK stack and is comprised of: elasticsearch,fluentd and kibana
+ElasticSearch:
+	1.Elasticsearch is a distributed, open source search and analytics engine for all types of data, including textual, numerical, geospatial, structured, and unstructured.
+	2.The speed and scalability of Elasticsearch and its ability to index many types of content mean that it can be used for a number of use cases:
+		Application search
+		Website search
+		ApplicationPerformanceMonitoring(APM)
+Fluentd:
+	1.Fluentd to collect, transform, and ship log data to the Elasticsearch backend. 
+	2.Fluentd is a popular open-source data collector that we’ll set up on our Kubernetes nodes to tail container log files, filter and 
+transform the log data, and deliver it to the Elasticsearch cluster, where it will be indexed and stored.
+Kibana:
+	1.Kibana is a data visualization and management tool for Elasticsearch that provides real-time histograms, line graphs, pie charts, and maps.
+
+
+
+{
+   "id":1,
+   "name":"Cosmin Seceleanu",
+   "email":"cosmin.seceleanu@email.com"
+}
+
+
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{“name”:”Cosmin Seceleanu”,”email”:”cosmin.seceleanu@email.com”}' \
+   http://localhost:8080/api/v1/users/
+
+
+java -javaagent:/root/elastic-jar/elastic-apm.jar  \
+     -Delastic.apm.service_name=my-application \
+     -Delastic.apm.server_url=http://localhost:8200 \
+     -Delastic.apm.application_packages=org.example \
+     -jar /root/app/tutorials/elastic-apm-java/target/apm-0.0.1-SNAPSHOT.jar
+
+
+
+java -javaagent:/root/elastic-jar/elastic-apm-agent-1.18.0.jar -jar target/mysql-service-0.0.1-SNAPSHOT.jar 

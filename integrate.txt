@@ -1,0 +1,231 @@
+steps to deploy using jenkins:
+	1.remove the pem files in the path:cd /root/.ssh
+	  add the pem file as vim josis.pem and add the key
+	  then use commands:
+	  chmod 400 josis.pem
+	  ssh -i josis.pem ubuntu@ipaddress
+	2.create the new repository and import the code by cloning the github link
+	3.edit the jenkins file and make changes in gitclone link,and emailsection
+	4.edit the variables.tf in path /04-Terraform/03-Ansible-Deploy/variables.tf as 
+		variable "key_name" {
+  		default = "josis"(keypair name)
+				    }
+
+		variable "pvt_key" {
+ 		default = "/root/.ssh/josis.pem"(path of pem file)
+				   }
+
+		variable "us-east-zones" {
+ 		default = ["us-east-1a", "us-east-1b"]
+					 }
+
+		variable "sg-id" {
+ 		default = "sg-0c9bd1cb06f000273"(yours security group id)
+				 }
+		commit the changes.
+	5.install jenkins if required.
+	6.create pipeline as code and then configure in jenkins->manageJenkins->configure->Globalproperties->environmentVariables->add access key and 
+	  security key here from the path of cat /root/.bashrc
+	7.build the pipeline and check for instance creation and run it on a server
+
+Running Playbook:
+	1.create an instance and generate either a existing key pair or new key pair
+		for this ubuntu instance run a new vm and install python
+	2.go to path of cd /root/.ssh
+	3.remove unwanted pem files and create new pem file with existing key pair
+	4.chmod 400 charan.pem
+	5.ssh -i charan.pem ubuntu@34.209.135.232(ip address of instance)
+	6.goto cd mindteee-devops-30Jan2020/03-Ansible/01-Inventory
+	7.edit the inventory file and keep only ip address vim inventory
+	8.ansible all -i inventory -m ping -u ubuntu --key /root/.ssh/charan.pem -s
+	9.if you want to run a playbook then
+		 ansible-playbook -i inventory -u ubuntu --key /root/.ssh/charan.pem web-playbook.yaml
+	
+
+Ansible_inventory:
+	Inventory is a collection of hosts against which ansible can work with.
+		hosts may be network devices or containers
+	static inventory example:
+		10.42.0.2
+		10.42.0.6
+		10.42.0.8	
+	1.create a new group of groups:
+		[web_servers]
+		web1
+		web2
+		web3
+
+		[db_servers]
+		db1
+
+		[all_servers:children]
+		web_servers
+		db_servers
+
+Ad-hoc commands:
+	1.to check connectvity with host
+		ansible all -m ping
+		eg.ansible all -i hosts -u vagrant -m ping
+	2.to check the uptime of the webgroup server
+		ansible web -m command -a "uptime"
+	3.to display info about local machine
+		ansinle localhost -m setup
+		eg.ansible all -i hosts -u vagrant -m setup
+
+Docker commands:
+	1.docker run nginx
+		it'll start a container for the instance of the nginx
+		*container only runs until process exists.
+	2.docker ps 
+		it'll list running containers
+	3.docker ps -a 
+		it'll list all containers
+	4.docker stop conId
+		it'll stop container
+`	5.docker rm conId
+		it'll remove container
+		*docker rm conId1 conId2 conId3
+		it'll remove multiple containers at a time
+	6.docker images
+		it'll show list of images
+	7.docker rmi imageId
+		it'll remove image and it can be done only when no container running for such image
+	8.docker pull nginx
+		it'll download image but not run any container
+	9.docker exec conId cat /etc/hosts
+		it'll executes a command on a running container
+	10.docker run conId
+		it'll be in attached mode and we'll see it in foreground and knows the output
+	11.docker run -d conId
+		it'll run container in detatched mode,it means it happens in background and we'll return to command prompt
+	12.docker attach conId 
+		to run container back in foreground mode
+	13.docker run -it centos bash	
+		it goes directly inside the container
+		cat /etc/*release* shows details
+	14.docker run sleep 20
+		it'll run container for 20s
+	15.docker run nginx:14.04
+		where 14.04 is tag
+		when you don't specify,it'll take as default as latest
+	16.docker run -it kodecloud/somple-docker
+		-it means interactive as well as terminal to get scripts executed
+	17.docker run -p 80:5000 kodecloud/simple-docker
+		it maps port of docker container to the free port of localhost
+		*we can run same container on different ports
+	18.docker run -v /opt/datadir:/var/lib/mysql mysql (run-
+		to persist data you want to map a directory outside container on docker host(/opt/datadir) to a directory inside the container(/var/lib/mysql)
+		it'll implicitly mount external directory to folder inside docker container so all data will be stored in external volume at /opt/datadir
+	19.docker inspect conId
+		it'll give details of container such as state,mounts,config data,network
+	20.docker logs conId
+		it'll show contents of container
+	21.docker run -p 8080:8080 -v /root/my-jenkins-data:/var/jenkins_home jenkins
+	22.docker run -e APP_COLOR:blue conId
+		it'll change color using environment variables
+deploy app using docker:
+	1.import the code to new repo
+	2.add the docker file as Dockerfile
+		FROM tomcat:9.0
+		MAINTAINER Bhascker
+		COPY target/company-0.0.1-SNAPSHOT.war(target-war file) /usr/local/tomcat/webapps/ROOT.war
+		EXPOSE 8080
+		CMD ["catalina.sh","run"]
+	3.add the docker-compose as docker-compose.yaml
+		version: '2'
+		services:
+ 		 petclinic:
+   		 build: . 
+  		  ports:
+   		   - '30080:8080'
+	4.add the jenkins file as jenlinsfile
+		node {
+		 try  {
+		 notify('Job Started') 
+
+     
+ 		 stage('Git-Checkout') {
+ 		  git 'https://github.com/imbhascker13/companies.git'
+ 					 }
+    
+ 		def project_path="company"(pom.xml path)
+ 
+ 		dir(project_path) {
+    
+  		stage('Maven-Clean') {
+  		 sh label: '', script: 'mvn clean'
+  		}
+    
+ 		stage('Maven-Compile') {
+ 		  sh label: '', script: 'mvn compile'
+ 					 }
+  		  stage('Sonar Analysis'){
+   		     withSonarQubeEnv('Sonarqube'){
+     		    sh 'mvn sonar:sonar'
+     		   }
+      			  }
+ 
+ 		  stage('Maven-Test') {
+  		 sh label: '', script: 'mvn test'
+  			}
+  
+  		 stage('Maven-Package') {
+  		 sh label: '', script: 'mvn package'
+  			}
+  
+  		 stage('Archive-Artifacts') {
+  		 archiveArtifacts 'target/*.war'
+  			}
+ 		 stage('Jfrog Artifacory Upload') {
+  		      def server= Artifactory.server 'Artifactory'
+                    def uploadSpec= """{
+                        "files": [{
+                        "pattern": "target/*.war",
+                        "target": "petclinic"}]
+                    }"""
+        server.upload(uploadSpec)
+        
+        }
+   		stage('Docker-Stage-Deployment') {
+  		 sh label: '', script: 'docker-compose up -d --build'
+ 		 }
+		  stage('Input') {
+                input('Do you want to proceed?')           
+       		 }
+ 
+  stage('Geting Ready For Ansible') {
+  sh label: 'Docker', script: 'cp -rf target/*.war ../../../04-Terraform/03-Ansible-Deploy/ansible/04-Tomcat/templates/'
+  sh label: 'Jenkins', script: "echo '<h1> TASK BUILD ID: ${env.BUILD_DISPLAY_NAME}</h1>' > ../../../04-Terraform/03-Ansible-Deploy/ansible/04-Tomcat/templates/apps/index.html"
+}  
+   
+ }
+
+def project_terra="04-Terraform/03-Ansible-Deploy"
+dir(project_terra) {
+   stage('Prod Deployment on AWS'){
+   sh label: 'terraform', script: '/bin/terraform  init'
+   sh label: 'terraform', script: '/bin/terraform  apply -input=false -auto-approve'
+   }
+}
+
+notify('Job Completed')   
+} catch (err) {
+  notify("Error ${err}")
+  currentBuild.result = 'FAILURE'
+}
+}
+
+
+
+def notify(status){
+    emailext (
+	to: "bhaskarreddygbr7@gmail.com",
+	subject: "${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+	 body: """<p>${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+	<p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
+		)
+	}
+		5.make changes in pom.xml
+			remove the mysql version tag
+			add tomcat jasper version to 9.0.1
+		6.change application properties to azure link:3306

@@ -1,0 +1,173 @@
+configure alert manager with email:
+global:
+ resolve_timeout: 1m
+
+route:
+  group_by: [Alertname]
+  # Send all notifications to me.
+  receiver: email-me
+
+receivers:
+- name: email-me
+  email_configs:
+  - to: bhaskarreddygbr7@gmail.com
+    from: iambhascker13@gmail.com
+    smarthost: smtp.gmail.com:587
+    auth_username: "iambhascker13@gmail.com"
+    auth_identity: "iambhascker13@gmail.com"
+    auth_password: "dogwtcrnspmhfbwp"
+
+-------------------------------------------
+
+configure alert manager with slack:
+
+global:
+  resolve_timeout: 1m
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'slack-notifications'
+receivers:
+- name: 'slack-notifications'
+  slack_configs:
+  - api_url: "https://hooks.slack.com/services/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"
+    channel: '#monitoring-instances'
+    send_resolved: true
+
+    icon_url: https://avatars3.githubusercontent.com/u/3380462
+    title: |-
+      [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }} for {{ .CommonLabels.job }}
+      {{- if gt (len .CommonLabels) (len .GroupLabels) -}}
+        {{" "}}(
+        {{- with .CommonLabels.Remove .GroupLabels.Names }}
+          {{- range $index, $label := .SortedPairs -}}
+            {{ if $index }}, {{ end }}
+            {{- $label.Name }}="{{ $label.Value -}}"
+          {{- end }}
+        {{- end -}}
+        )
+      {{- end }}
+    text: >-
+      {{ with index .Alerts 0 -}}
+        :chart_with_upwards_trend: *<{{ .GeneratorURL }}|Graph>*
+        {{- if .Annotations.runbook }}   :notebook: *<{{ .Annotations.runbook }}|Runbook>*{{ end }}
+      {{ end }}
+      *Alert details*:
+      {{ range .Alerts -}}
+        *Alert:* {{ .Annotations.title }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+      *Description:* {{ .Annotations.description }}
+      *Details:*
+        {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+        {{ end }}
+      {{ end }}
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']
+
+
+good evening prakash
+i had got config files for both slack and email and i need to replace those config files in alertmanager.yaml 
+but that default config file was stored as encryted secret and i don't find a way of converting yaml file as encrypted secret
+actually aditya stored config file as secret so with help of him we'll be completing it by tmrw asap
+
+ Z2xvYmFsOgogIHJlc29sdmVfdGltZW91dDogNW0KcmVjZWl2ZXJzOgotIG5hbWU6ICJudWxsIgpyb3V0ZToKICBncm91cF9ieToKICAtIGpvYgogIGdyb3VwX2ludGVydmFsOiA1bQogIGdyb3VwX3dhaXQ6IDMwcwogIHJlY2VpdmVyOiAibnVsbCIKICByZXBlYXRfaW50ZXJ2YWw6IDEyaAogIHJvdXRlczoKICAtIG1hdGNoOgogICAgICBhbGVydG5hbWU6IFdhdGNoZG9nCiAgICByZWNlaXZlcjogIm51bGwiCg==
+
+
+
+global:
+  resolve_timeout: 1m
+  http_config: {}
+  smtp_hello: localhost
+  smtp_require_tls: true
+  pagerduty_url: https://events.pagerduty.com/v2/enqueue
+  opsgenie_api_url: https://api.opsgenie.com/
+  wechat_api_url: https://qyapi.weixin.qq.com/cgi-bin/
+  victorops_api_url: https://alert.victorops.com/integrations/generic/20131114/alert/
+route:
+  receiver: "null"
+  group_by:
+  - job
+  routes:
+  - receiver: "null"
+    match:
+      alertname: Watchdog
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+receivers:
+- name: "null"
+templates: []
+
+
+
+Z2xvYmFsOgogIHJlc29sdmVfdGltZW91dDogMW0KICBodHRwX2NvbmZpZzoge30KICBzbXRwX2hlbGxvOiBsb2NhbGhvc3QKICBzbXRwX3JlcXVpcmVfdGxzOiB0cnVlCiAgcGFnZXJkdXR5X3VybDogaHR0cHM6Ly9ldmVudHMucGFnZXJkdXR5LmNvbS92Mi9lbnF1ZXVlCiAgb3BzZ2VuaWVfYXBpX3VybDogaHR0cHM6Ly9hcGkub3BzZ2VuaWUuY29tLwogIHdlY2hhdF9hcGlfdXJsOiBodHRwczovL3F5YXBpLndlaXhpbi5xcS5jb20vY2dpLWJpbi8KICB2aWN0b3JvcHNfYXBpX3VybDogaHR0cHM6Ly9hbGVydC52aWN0b3JvcHMuY29tL2ludGVncmF0aW9ucy9nZW5lcmljLzIwMTMxMTE0L2FsZXJ0Lwpyb3V0ZToKICByZWNlaXZlcjogIm51bGwiCiAgZ3JvdXBfYnk6CiAgLSBqb2IKICByb3V0ZXM6CiAgLSByZWNlaXZlcjogIm51bGwiCiAgICBtYXRjaDoKICAgICAgYWxlcnRuYW1lOiBXYXRjaGRvZwogIGdyb3VwX3dhaXQ6IDMwcwogIGdyb3VwX2ludGVydmFsOiA1bQogIHJlcGVhdF9pbnRlcnZhbDogMTJoCnJlY2VpdmVyczoKLSBuYW1lOiAibnVsbCIKdGVtcGxhdGVzOiBbXQoK
+
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQoKcm91dGU6CiAgZ3JvdXBfYnk6IFtBbGVydG5hbWVdCiAgIyBTZW5kIGFsbCBub3RpZmljYXRpb25zIHRvIG1lLgogIHJlY2VpdmVyOiBlbWFpbC1tZQoKcmVjZWl2ZXJzOgotIG5hbWU6IGVtYWlsLW1lCiAgZW1haWxfY29uZmlnczoKICAtIHRvOiBiaGFza2FycmVkZHlnYnI3QGdtYWlsLmNvbQogICAgZnJvbTogaWFtYmhhc2NrZXIxM0BnbWFpbC5jb20KICAgIHNtYXJ0aG9zdDogc210cC5nbWFpbC5jb206NTg3CiAgICBhdXRoX3VzZXJuYW1lOiAiaWFtYmhhc2NrZXIxM0BnbWFpbC5jb20iCiAgICBhdXRoX2lkZW50aXR5OiAiaWFtYmhhc2NrZXIxM0BnbWFpbC5jb20iCiAgICBhdXRoX3Bhc3N3b3JkOiAiZG9nd3Rjcm5zcG1oZmJ3cCIKCg==
+
+
+Z2xvYmFsOgogIHJlc29sdmVfdGltZW91dDogMW0KCnJvdXRlOgogIGdyb3VwX2J5OiBbJ2FsZXJ0bmFtZSddCiAgZ3JvdXBfd2FpdDogMTBzCiAgZ3JvdXBfaW50ZXJ2YWw6IDEwcwogIHJlcGVhdF9pbnRlcnZhbDogMWgKICByZWNlaXZlcjogJ3NsYWNrLW5vdGlmaWNhdGlvbnMnCnJlY2VpdmVyczoKLSBuYW1lOiAnc2xhY2stbm90aWZpY2F0aW9ucycKICBzbGFja19jb25maWdzOgogIC0gYXBpX3VybDogImh0dHBzOi8vaG9va3Muc2xhY2suY29tL3NlcnZpY2VzL1QwMTNKRzVQUlFUL0IwMUZSUFdBRVVFL0RoOEJyRXF2Z0FpcDVlTVZtQXRNOHRrQyIKICAgIGNoYW5uZWw6ICcjbW9uaXRvcmluZy1pbnN0YW5jZXMnCiAgICBzZW5kX3Jlc29sdmVkOiB0cnVlCgogICAgaWNvbl91cmw6IGh0dHBzOi8vYXZhdGFyczMuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3UvMzM4MDQ2MgogICAgdGl0bGU6IHwtCiAgICAgIFt7eyAuU3RhdHVzIHwgdG9VcHBlciB9fXt7IGlmIGVxIC5TdGF0dXMgImZpcmluZyIgfX06e3sgLkFsZXJ0cy5GaXJpbmcgfCBsZW4gfX17eyBlbmQgfX1dIHt7IC5Db21tb25MYWJlbHMuYWxlcnRuYW1lIH19IGZvciB7eyAuQ29tbW9uTGFiZWxzLmpvYiB9fQogICAgICB7ey0gaWYgZ3QgKGxlbiAuQ29tbW9uTGFiZWxzKSAobGVuIC5Hcm91cExhYmVscykgLX19CiAgICAgICAge3siICJ9fSgKICAgICAgICB7ey0gd2l0aCAuQ29tbW9uTGFiZWxzLlJlbW92ZSAuR3JvdXBMYWJlbHMuTmFtZXMgfX0KICAgICAgICAgIHt7LSByYW5nZSAkaW5kZXgsICRsYWJlbCA6PSAuU29ydGVkUGFpcnMgLX19CiAgICAgICAgICAgIHt7IGlmICRpbmRleCB9fSwge3sgZW5kIH19CiAgICAgICAgICAgIHt7LSAkbGFiZWwuTmFtZSB9fT0ie3sgJGxhYmVsLlZhbHVlIC19fSIKICAgICAgICAgIHt7LSBlbmQgfX0KICAgICAgICB7ey0gZW5kIC19fQogICAgICAgICkKICAgICAge3stIGVuZCB9fQogICAgdGV4dDogPi0KICAgICAge3sgd2l0aCBpbmRleCAuQWxlcnRzIDAgLX19CiAgICAgICAgOmNoYXJ0X3dpdGhfdXB3YXJkc190cmVuZDogKjx7eyAuR2VuZXJhdG9yVVJMIH19fEdyYXBoPioKICAgICAgICB7ey0gaWYgLkFubm90YXRpb25zLnJ1bmJvb2sgfX0gICA6bm90ZWJvb2s6ICo8e3sgLkFubm90YXRpb25zLnJ1bmJvb2sgfX18UnVuYm9vaz4qe3sgZW5kIH19CiAgICAgIHt7IGVuZCB9fQogICAgICAqQWxlcnQgZGV0YWlscyo6CiAgICAgIHt7IHJhbmdlIC5BbGVydHMgLX19CiAgICAgICAgKkFsZXJ0Oioge3sgLkFubm90YXRpb25zLnRpdGxlIH19e3sgaWYgLkxhYmVscy5zZXZlcml0eSB9fSAtIGB7eyAuTGFiZWxzLnNldmVyaXR5IH19YHt7IGVuZCB9fQogICAgICAqRGVzY3JpcHRpb246KiB7eyAuQW5ub3RhdGlvbnMuZGVzY3JpcHRpb24gfX0KICAgICAgKkRldGFpbHM6KgogICAgICAgIHt7IHJhbmdlIC5MYWJlbHMuU29ydGVkUGFpcnMgfX0g4oCiICp7eyAuTmFtZSB9fToqIGB7eyAuVmFsdWUgfX1gCiAgICAgICAge3sgZW5kIH19CiAgICAgIHt7IGVuZCB9fQppbmhpYml0X3J1bGVzOgogIC0gc291cmNlX21hdGNoOgogICAgICBzZXZlcml0eTogJ2NyaXRpY2FsJwogICAgdGFyZ2V0X21hdGNoOgogICAgICBzZXZlcml0eTogJ3dhcm5pbmcnCiAgICBlcXVhbDogWydhbGVydG5hbWUnLCAnZGV2JywgJ2luc3RhbmNlJ10K
+
+
+b0f924d7aefe4512bae4729ef0416a46
+
+25f8b44d8772495cbc24a97afbab6723
+
+8f85f11739b14fa086a938b305d480f8
+
+9791415241
+
+global:
+ resolve_timeout: 1m
+ pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+
+route:x
+ receiver: 'pagerduty-notifications'
+
+receivers:
+- name: 'pagerduty-notifications'
+ pagerduty_configs:
+ - service_key: 25f8b44d8772495cbc24a97afbab6723
+   send_resolved: true
+
+global:
+ resolve_timeout: 1m
+ pagerduty_url: https://events.pagerduty.com/v2/enqueue
+route:
+ group_by: [cluster]
+ # If an alert isn't caught by a route, send it to the pager.
+ 
+ receiver: pagerduty-notification
+ routes:
+  # Send severity=page alerts to the pager.
+  - match:
+      severity: page
+    receiver: pagerduty-notification
+
+receivers:
+- name: pagerduty-notification
+  pagerduty_configs:
+  - service_key: ac0e40f7e65f4c0e9a4d9740b805b2fb
+    send_resolved: true
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogJ2h0dHBzOi8vcHJvbWV0aGV1cy1hbGVydHNzLnBhZ2VyZHV0eS5jb20vJwoKcm91dGU6eAogcmVjZWl2ZXI6ICdwYWdlcmR1dHktbm90aWZpY2F0aW9ucycKCnJlY2VpdmVyczoKLSBuYW1lOiAncGFnZXJkdXR5LW5vdGlmaWNhdGlvbnMnCiBwYWdlcmR1dHlfY29uZmlnczoKIC0gc2VydmljZV9rZXk6IDI1ZjhiNDRkODc3MjQ5NWNiYzI0YTk3YWZiYWI2NzIzCiAgIHNlbmRfcmVzb2x2ZWQ6IHRydWUK
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogJ2h0dHBzOi8vZXZlbnRzLnBhZ2VyZHV0eS5jb20vdjIvZW5xdWV1ZScKCnJvdXRlOngKIHJlY2VpdmVyOiAncGFnZXJkdXR5LW5vdGlmaWNhdGlvbnMnCgpyZWNlaXZlcnM6Ci0gbmFtZTogJ3BhZ2VyZHV0eS1ub3RpZmljYXRpb25zJwogcGFnZXJkdXR5X2NvbmZpZ3M6CiAtIHNlcnZpY2Vfa2V5OiAyNWY4YjQ0ZDg3NzI0OTVjYmMyNGE5N2FmYmFiNjcyMwogICBzZW5kX3Jlc29sdmVkOiB0cnVlCg==
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogaHR0cHM6Ly9ldmVudHMucGFnZXJkdXR5LmNvbS92Mi9lbnF1ZXVlCnJvdXRlOgogZ3JvdXBfYnk6IFtjbHVzdGVyXQogIyBJZiBhbiBhbGVydCBpc24ndCBjYXVnaHQgYnkgYSByb3V0ZSwgc2VuZCBpdCB0byB0aGUgcGFnZXIuCiByZWNlaXZlcjogdGVhbS1wYWdlcgogcm91dGVzOgogICMgU2VuZCBzZXZlcml0eT1wYWdlIGFsZXJ0cyB0byB0aGUgcGFnZXIuCiAgLSBtYXRjaDoKICAgICAgc2V2ZXJpdHk6IHBhZ2UKICAgIHJlY2VpdmVyOiB0ZWFtLXBhZ2VyCgpyZWNlaXZlcnM6Ci0gbmFtZTogdGVhbS1wYWdlcgogIHBhZ2VyZHV0eV9jb25maWdzOgogIC0gc2VydmljZV9rZXk6IDhmODVmMTE3MzliMTRmYTA4NmE5MzhiMzA1ZDQ4MGY4CiAgICBzZW5kX3Jlc29sdmVkOiB0cnVlCg==
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogaHR0cHM6Ly9ldmVudHMucGFnZXJkdXR5LmNvbS92Mi9lbnF1ZXVlCnJvdXRlOgogZ3JvdXBfYnk6IFtjbHVzdGVyXQogIyBJZiBhbiBhbGVydCBpc24ndCBjYXVnaHQgYnkgYSByb3V0ZSwgc2VuZCBpdCB0byB0aGUgcGFnZXIuCiBncm91cF93YWl0OiAxMHMKIGdyb3VwX2ludGVydmFsOiAxMHMKIHJlcGVhdF9pbnRlcnZhbDogNWgKIHJlY2VpdmVyOiB0ZWFtLXBhZ2VyCiByb3V0ZXM6CiAgIyBTZW5kIHNldmVyaXR5PXBhZ2UgYWxlcnRzIHRvIHRoZSBwYWdlci4KICAtIG1hdGNoOgogICAgICBzZXZlcml0eTogcGFnZQogICAgcmVjZWl2ZXI6IHRlYW0tcGFnZXIKCnJlY2VpdmVyczoKLSBuYW1lOiB0ZWFtLXBhZ2VyCiAgcGFnZXJkdXR5X2NvbmZpZ3M6CiAgLSBzZXJ2aWNlX2tleTogOGY4NWYxMTczOWIxNGZhMDg2YTkzOGIzMDVkNDgwZjgKICAgIHNlbmRfcmVzb2x2ZWQ6IHRydWUK
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogaHR0cHM6Ly9ldmVudHMucGFnZXJkdXR5LmNvbS92Mi9lbnF1ZXVlCnJvdXRlOgogZ3JvdXBfYnk6IFtjbHVzdGVyXQogIyBJZiBhbiBhbGVydCBpc24ndCBjYXVnaHQgYnkgYSByb3V0ZSwgc2VuZCBpdCB0byB0aGUgcGFnZXIuCiAKIHJlY2VpdmVyOiBwYWdlcmR1dHktbm90aWZpY2F0aW9ucwogcm91dGVzOgogICMgU2VuZCBzZXZlcml0eT1wYWdlIGFsZXJ0cyB0byB0aGUgcGFnZXIuCiAgLSBtYXRjaDoKICAgICAgc2V2ZXJpdHk6IHBhZ2UKICAgIHJlY2VpdmVyOiBwYWdlcmR1dHktbm90aWZpY2F0aW9ucwoKcmVjZWl2ZXJzOgotIG5hbWU6IHBhZ2VyZHV0eS1ub3RpZmljYXRpb25zCiAgcGFnZXJkdXR5X2NvbmZpZ3M6CiAgLSBzZXJ2aWNlX2tleTogMGU2ZTM1OGE0ZGZhNDM5Njg2OGNjODE3ZDc5YzFkODEKICAgIHNlbmRfcmVzb2x2ZWQ6IHRydWUK
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogaHR0cHM6Ly9ldmVudHMucGFnZXJkdXR5LmNvbS92Mi9lbnF1ZXVlCnJvdXRlOgogZ3JvdXBfYnk6IFtjbHVzdGVyXQogIyBJZiBhbiBhbGVydCBpc24ndCBjYXVnaHQgYnkgYSByb3V0ZSwgc2VuZCBpdCB0byB0aGUgcGFnZXIuCiAKIHJlY2VpdmVyOiBwYWdlcmR1dHktbm90aWZpY2F0aW9ucwogcm91dGVzOgogICMgU2VuZCBzZXZlcml0eT1wYWdlIGFsZXJ0cyB0byB0aGUgcGFnZXIuCiAgLSBtYXRjaDoKICAgICAgc2V2ZXJpdHk6IHBhZ2UKICAgIHJlY2VpdmVyOiBwYWdlcmR1dHktbm90aWZpY2F0aW9ucwoKcmVjZWl2ZXJzOgotIG5hbWU6IHBhZ2VyZHV0eS1ub3RpZmljYXRpb25zCiAgcGFnZXJkdXR5X2NvbmZpZ3M6CiAgLSBzZXJ2aWNlX2tleTogYWU1NTBkZmJmMWJjNDIwNjg3YTkwYzNmOTNmZjc5NjAKICAgIHNlbmRfcmVzb2x2ZWQ6IHRydWUK
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogaHR0cHM6Ly9ldmVudHMucGFnZXJkdXR5LmNvbS92Mi9lbnF1ZXVlCnJvdXRlOgogZ3JvdXBfYnk6IFtjbHVzdGVyXQogIyBJZiBhbiBhbGVydCBpc24ndCBjYXVnaHQgYnkgYSByb3V0ZSwgc2VuZCBpdCB0byB0aGUgcGFnZXIuCiAKIHJlY2VpdmVyOiBwYWdlcmR1dHktbm90aWZpY2F0aW9ucwogcm91dGVzOgogICMgU2VuZCBzZXZlcml0eT1wYWdlIGFsZXJ0cyB0byB0aGUgcGFnZXIuCiAgLSBtYXRjaDoKICAgICAgc2V2ZXJpdHk6IHBhZ2UKICAgIHJlY2VpdmVyOiBwYWdlcmR1dHktbm90aWZpY2F0aW9ucwoKcmVjZWl2ZXJzOgotIG5hbWU6IHBhZ2VyZHV0eS1ub3RpZmljYXRpb25zCiAgcGFnZXJkdXR5X2NvbmZpZ3M6CiAgLSBzZXJ2aWNlX2tleTogMWRjMTlhNjk0NTVhNDNkNjhlZGUyNDM1YzhjMDkyZGEJCiAgICBzZW5kX3Jlc29sdmVkOiB0cnVlCgo=
+
+Z2xvYmFsOgogcmVzb2x2ZV90aW1lb3V0OiAxbQogcGFnZXJkdXR5X3VybDogaHR0cHM6Ly9ldmVudHMucGFnZXJkdXR5LmNvbS92Mi9lbnF1ZXVlCnJvdXRlOgogZ3JvdXBfYnk6IFtjbHVzdGVyXQogIyBJZiBhbiBhbGVydCBpc24ndCBjYXVnaHQgYnkgYSByb3V0ZSwgc2VuZCBpdCB0byB0aGUgcGFnZXIuCiAKIHJlY2VpdmVyOiBwYWdlcmR1dHktbm90aWZpY2F0aW9uCiByb3V0ZXM6CiAgIyBTZW5kIHNldmVyaXR5PXBhZ2UgYWxlcnRzIHRvIHRoZSBwYWdlci4KICAtIG1hdGNoOgogICAgICBzZXZlcml0eTogcGFnZQogICAgcmVjZWl2ZXI6IHBhZ2VyZHV0eS1ub3RpZmljYXRpb24KCnJlY2VpdmVyczoKLSBuYW1lOiBwYWdlcmR1dHktbm90aWZpY2F0aW9uCiAgcGFnZXJkdXR5X2NvbmZpZ3M6CiAgLSBzZXJ2aWNlX2tleTogYWMwZTQwZjdlNjVmNGMwZTlhNGQ5NzQwYjgwNWIyZmIKICAgIHNlbmRfcmVzb2x2ZWQ6IHRydWUK

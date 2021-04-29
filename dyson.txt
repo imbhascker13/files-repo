@@ -1,0 +1,22 @@
+Please find below the inputs needed for Contribution to count for Current Appraisal cycle. Current proficiency, Career Aspirations & other details.
+
+1.Tools: BitBucket, GitHub, Kubernetes, Ansible, SonarQube
+  Cloud: Azure, GCP
+  Application languages: Java, JQuery
+  Build tools: Maven
+  Pipelines : Declarative and Scripted Pipelines in Jenkins, Bitbucket Pipelines
+
+2.Jenkins, TruffleHog, Prometheus Alert Manager, ELK Stack, EFK Stack, Docker, APM metrics, PagerDuty, Slack (these are the tools I can rate myself 4/5 and had chance to work on it).
+
+3.I am learning AzureDevops as I will be planning to take AZ 400 – Designing and implementing Microsoft DevOps solutions.
+
+4.I have completed azure cloud certifications(AZ 900 –Microsoft Azure Fundamentals , AZ 104 –Microsoft Azure Administrator)
+
+5.I have knowledge on Java Spring boot. JDBC, Java Spring boot MVC etc.
+
+6.I need to possess extensive knowledge on cloud platform and be an expert in implementing various DevOps automation tools and processes  to resolve complex operation problems.
+
+7.No issues
+
+8. I had given my 100%  on two accelerators which I worked on i.e., DevOps Stack on Slack and SRE Observability Dashboards.
+   I had worked on problem statements related to deployment of CI/CD pipeline for java webapp, .Netapp and I acquired required credits for Yorbit completion

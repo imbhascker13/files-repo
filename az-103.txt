@@ -1,0 +1,4 @@
+installing internet information services:
+	windows server->addroles and features->server roles->web server->add features->next->next->install
+	if you browse localhost,u'll get homepage of internet info services
+				

@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mysql-deploy
+  name: mysql-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mysql-deploy
+    spec:
+      containers:
+      - image: mysql:latest
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: root
+        resources: {}
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: mysql-deploy
+  name: mysql-deploy
+spec:
+ ports:
+  - name: 3306-3306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql-deploy
+   type: ClusterIP
+status: 
+  loadBalancer: {}
+
+FROM openjdk:8-jdk-alpine
+
+COPY target/apm-0.0.1-SNAPSHOT.jar /app.jar
+
+RUN wget -O /apm-agent.jar https://search.maven.org/remotecontent?filepath=co/elastic/apm/elastic-apm-agent/1.2.0/elastic-apm-agent-1.2.0.jar
+
+CMD java -jar /app.jar
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: spring-boot-simple
+  labels:
+    app: spring-boot-simple
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-simple
+  template:
+    metadata:
+      labels:
+        app: spring-boot-simple
+    spec:
+      containers:
+      - image: iambhascker13/myimage:v13.0.0
+        imagePullPolicy: Always
+        name: spring-boot-simple
+        command:
+          - "java"
+          - "-javaagent:/apm-agent.jar"
+	  - "-Delastic.apm.active=true"
+          - "-Delastic.apm.server_urls=http://apm-server.monitoring.svc.cluster.local:8200"
+          - "-Delastic.apm.service_name=user-service"
+          - "-jar"
+          - "app.jar"
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: root
+          - name: ELASTIC_APM_ACTIVE
+            value: "true"
+          - name: ELASTIC_APM_SERVER
+            value: http://apm-server.monitoring.svc.cluster.local:8200
+        ports:
+        - containerPort: 8080
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: spring-boot-simple
+  name: spring-boot-simple
+spec:
+ ports:
+  - name: 8080-8080
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: spring-boot-simple
+   type: ClusterIP
+status: 
+  loadBalancer: {}

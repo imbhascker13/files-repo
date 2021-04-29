@@ -1,0 +1,49 @@
+Log analysis:
+
+Log analysis is the process of analysing the computer/machine generated data
+	
+	collection of data --> extraction of data --> convert into structured form --> analyse the data --> obtain the results
+
+Need for log analysis:
+
+	-->Issue Debugging:
+
+		whenever we came across an issue in production scenario, in order to debug the issue we read the logs, it helps us to debug the issue
+
+	-->Predictive Analysis:
+
+		reading of logs in regular intervals we can reduce the occurence of certain issues or errors is a predictive analysis eg: if we findout 
+earlier some issue which'll breakdown the server
+
+	-->Security Analysis:
+
+		if there's any attack going on u r application those kinda things are captured in logs eg:DDos attack, penetration attack
+		
+	-->Performance analysis:
+   		
+		logs help us to analyse the performance of app as well such as whether it's performing good or had it slowed down
+
+	-->Internet of things& Debugging:
+
+		it's related to app pov, if an app taking data from an external server and performing an action
+
+ElasticSearch:
+	
+	Elasticsearch is a real-time, distributed storage, search, and analytics engine. It can be used for many purposes, but one context where it excels 
+is indexing streams of semi-structured data, such as logs
+
+Kibana:
+
+	Kibana is an open source analytics and visualization platform designed to work with Elasticsearch. You use Kibana to search, view, and interact with
+data stored in Elasticsearch indices. You can easily perform advanced data analysis and visualize your data in a variety of charts, tables, and maps.
+
+Beats:
+
+	Open Source data shippers to send operational data to Elasticsearch
+
+Fluentd:
+
+	Gathers logs from nodes and feeds them to Elasticsearch.
+
+	Fluentd is a popular open-source data collector that we'll set up on our Kubernetes nodes to tail container log files, filter and transform the 
+log data, and deliver it to the Elasticsearch cluster, where it will be indexed and stored.

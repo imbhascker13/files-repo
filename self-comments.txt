@@ -1,0 +1,58 @@
+I had completed the following two External Certifications:
+	
+	1.AZ-900: Microsoft Azure Fundamentals
+	2.AZ-104: Microsoft Azure Administrator
+
+I had completed the following Yorbit courses:
+
+	1.DevOps Basics 201
+	2.Azure DevOps 201
+	3.DevOps 301 Capstone Project
+
+	1.Based upon the requirement, I have deployed an web-application using CI/CD pipelines including various set of tools in pipeline such as Jenkins, Maven, SonarQube, JFrog, TruffleHog, 
+Snyk, Docker, Ansible etc.
+	2.I worked on different problem statements including deployment of Java-app, Node-JS app, and .Net Core app
+	3.I worked on Elasticsearch,Logstash and Kibana (ELK Stack), Elasticsearch,FluentD and Kibana (EFK Stack) and Application Performance Management metrics(APM metrics)
+	4.I worked on Prometheus Alert Manager and it's integration with tools like PagerDuty, Slack and their Combination
+	5.I worked on Slack and it's integration with various tools
+
+	I had been available and accesible in Mindtree Bussiness hours for discussions/interviews etc.
+	I responded in time for any Queries/Information to my reporting manager as well as other minds.
+	I applied leaves in system, NIO's for WFH and followed all policies and guidelines.
+
+In this 1 year of experience in DevOps, I tried to give my 100% on every task given to me. Other than accelerator work whenever I got time I worked on improving my skillset and acquired few external certifications.
+
+dyson decibel
+dyson admin user access
+dyson amasty checkout/single page checkout
+dyson badges
+dyson checkout coupon
+dyson cms and cms import/export
+dyson frontools
+dyson adobe target
+dyson afterpay
+dyson amastyfeed
+dyson booking system
+dyson diagnostic tool
+dyson cron cleaner
+dyson custom cache  --devops
+dyson gdpr cleanser --devops
+dyson gtm
+dyson module loop
+dyson notifyme
+dyson orders
+dyson paymark
+      debossing
+	product registration
+	salecycle
+	sap backoffice
+	serial lookup
+	sorted pro
+	sticky banner
+	zippay
+	theme loop
+	ui
+	backoffice alert
+	msrp
+	review groups
+	soft budles
